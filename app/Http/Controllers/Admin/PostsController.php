@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 use App\Post;
+use App\category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -14,8 +15,10 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
-        return view('admin.posts.index', compact('posts'));
+        $data = [
+            'posts' => Post::with('category')->paginate(10)
+        ];
+        return view('admin.posts.index', $data);
     }
 
     /**
@@ -25,9 +28,9 @@ class PostsController extends Controller
      */
     public function create()
     {
+        $categories = Category::all();
 
-
-        return view('admin.posts.create');
+        return view('admin.posts.create', compact('categories'));
     }
 
     /**
@@ -39,10 +42,19 @@ class PostsController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+
+        $request->validate(
+            [
+                'title' => 'required|max:30',
+                'body' => 'required|max:250'
+            ]
+        );
+
+
         $new_record = new Post();
-        $new_record->title = $data['title'];
-        $new_record->body = $data['body'];
+        $new_record->fill($data);
         $new_record->save();
+
         return redirect()->route('admin.posts.index');
     }
 
@@ -67,7 +79,8 @@ class PostsController extends Controller
     public function edit($id)
     {
         $post = Post::findOrFail($id);
-        return view('admin.posts.edit', compact('post'));
+        $categories = Category::all();
+        return view('admin.posts.edit', compact('post', 'categories'));
     }
 
     /**
@@ -80,6 +93,13 @@ class PostsController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all();
+        $request->validate(
+            [
+                'title' => 'required|max:30',
+                'body' => 'required|max:250'
+            ]
+        );
+
         $post = Post::findOrFail($id);
 
         $post->update($data);

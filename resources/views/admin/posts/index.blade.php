@@ -13,6 +13,7 @@
                 <th scope="col">ID</th>
                 <th scope="col">Title</th>
                 <th scope="col">Body</th>
+                <th scope="col">Category</th>
                 <th scope="col">Settings</th>
             </tr>
             </thead>
@@ -21,27 +22,36 @@
             @foreach($posts as $post)
 
             <tr>
+                {{-- id --}}
+                <th class="col-1" scope="row">{{$post->id}}</th>
+                {{-- title-> route to show --}}
+                <td class="col-3">
+                    <a href="{{route('admin.posts.show', $post->id)}}">{{$post->title}}</a>
+                </td>
+                {{-- body --}}
+                <td class="col-4">{{$post->body}}</td>
+                {{-- category --}}
+                @if (is_null($post->category))
+                <td class="col-2">N/D</td>
+                @else
+                <td class="col-2">{{$post->category['category']}}</td>
+                @endif
+                {{-- settings --}}
+                <td class="flex justify-content-between gap-3 col-2">
+                    {{-- edit --}}
+                    <a class="col-4 fs-5" href="{{route('admin.posts.edit', $post->id)}}" alt="edit">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    {{-- delete --}}
+                    <form method="POST" class="col-4 d-inline-flex" action="{{route('admin.posts.destroy', $post->id)}}">
+                        @csrf
+                        @method('DELETE')
 
-                    <th class="col-2" scope="row">{{$post['id']}}</th>
-                    <td class="col-4">
-                        <a href="{{route('admin.posts.show', $post['id'])}}">{{$post['title']}}</a>
-                    </td>
-                    <td class="col-4">{{$post['body']}}</td>
-                    <td class="flex justify-content-between gap-3 col-2">
-                        {{-- edit --}}
-                        <a class="col-4 fs-4" href="{{route('admin.posts.edit', $post['id'])}}" alt="edit">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                        {{-- delete --}}
-                        <form method="POST" class="col-4 d-inline-flex" action="{{route('admin.posts.destroy', $post['id'])}}">
-                            @csrf
-                            @method('DELETE')
-
-                            <button class="btn btn-link text-danger m-0 p-0 col-4">
-                                <i class="fa-sharp fa-solid fa-square-minus fs-4"></i>
-                            </button>
-                        </form>
-                    </td>
+                        <button class="btn btn-link text-danger m-0 p-0 col-4">
+                            <i class="fa-sharp fa-solid fa-square-minus fs-5"></i>
+                        </button>
+                    </form>
+                </td>
 
             </tr>
             @endforeach
